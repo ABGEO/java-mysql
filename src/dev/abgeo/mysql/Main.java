@@ -21,6 +21,10 @@ public class Main {
                 config.getDatabase(),
                 config.getPort()
         );
+
+        database.select("user", new String[] {"id", "username"});
+
+        database.close();
     }
 
     /**

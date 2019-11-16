@@ -34,8 +34,39 @@ public class Database {
      * @throws ClassNotFoundException ClassNotFoundException.
      * @throws SQLException           SQLException.
      */
-    public Connection connect() throws ClassNotFoundException, SQLException {
-        return DriverManager.getConnection(databaseUrl, user, password);
+    public Connection connect() {
+        try {
+            return DriverManager.getConnection(databaseUrl, user, password);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+    }
+
+    public void select(String table, String[] fields) {
+        StringBuilder normalizedFields = new StringBuilder();
+        for (String field: fields) {
+            normalizedFields.append(field).append(", ");
+        }
+        normalizedFields = new StringBuilder(normalizedFields.substring(0, normalizedFields.length() - 2));
+
+        String sql = String.format("SELECT %s FROM %s;", normalizedFields, table);
+
+        Statement stmt = null;
+        try {
+            stmt = this.connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                for (String field: fields) {
+                    System.out.print(rs.getString(field) + " ");
+                }
+                System.out.println();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -43,13 +74,11 @@ public class Database {
      *
      * @throws SQLException SQLException.
      */
-    public void close() throws SQLException {
-        this.connection.close();
+    public void close() {
+        try {
+            this.connection.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
-
-//            Statement stmt = con.createStatement();
-//            ResultSet rs = stmt.executeQuery("select * from user");
-//            while (rs.next()) {
-//                System.out.println(rs.getInt("id") + "  " + rs.getString("username"));
-//            }
